@@ -16,7 +16,14 @@ public class FareCalculatorService {
         long outMillis = ticket.getOutTime().getTime();
 
         double durationMillis = outMillis - inMillis;
+        double durationMinutes = durationMillis / (60 * 1000);
         double durationHours = durationMillis / (60 * 60 * 1000);
+
+        // Gratuité en deça de 30 minutes de parking.
+        if (durationMinutes < 30) {
+            ticket.setPrice(0);
+            return;
+        }
 
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
@@ -27,7 +34,7 @@ public class FareCalculatorService {
                 ticket.setPrice(durationHours * Fare.BIKE_RATE_PER_HOUR);
                 break;
             }
-            default: throw new IllegalArgumentException("Unkown Parking Type");
+            default: throw new IllegalArgumentException("Unknown Parking Type");
         }
     }
 }
