@@ -3,8 +3,20 @@ package com.parkit.parkingsystem.service;
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
+/**
+ * Service de calcul des tarifs de stationnement.
+ * Gère le calcul des prix selon le type de véhicule, la durée et les remises.
+ */
 public class FareCalculatorService {
 
+    /**
+     * Calcule le tarif de stationnement pour un ticket.
+     * Gratuit en dessous de 30 minutes. Applique une remise de 5% si demandée.
+     *
+     * @param ticket le ticket contenant les informations de stationnement
+     * @param discount true pour appliquer la remise de 5%, false sinon
+     * @throws IllegalArgumentException si l'heure de sortie est invalide
+     */
     public void calculateFare(Ticket ticket, boolean discount){
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
@@ -39,6 +51,11 @@ public class FareCalculatorService {
         if (discount) { ticket.setPrice(ticket.getPrice() * 0.95); }
     }
 
+    /**
+     * Calcule le tarif de stationnement sans remise.
+     *
+     * @param ticket le ticket contenant les informations de stationnement
+     */
     public void calculateFare(Ticket ticket) {
         calculateFare(ticket, false);
     }

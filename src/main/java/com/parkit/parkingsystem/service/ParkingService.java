@@ -11,6 +11,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
 
+/**
+ * La classe ParkingService gère les opérations principales associées au système de parking.
+ * Elle s'occupe des entrées et sorties de véhicules ainsi que des interactions avec les services
+ * sous-jacents tels que le calcul des tarifs, la lecture des entrées et la persistance des données
+ * pour les places de stationnement et les tickets.
+ */
 public class ParkingService {
 
     private static final Logger logger = LogManager.getLogger("ParkingService");
@@ -20,7 +26,14 @@ public class ParkingService {
     private ParkingSpotDAO parkingSpotDAO;
     private TicketDAO ticketDAO;
 
-
+    /**
+     * Constructeur initialisant les dépendances du service.
+     *
+     * @param fareCalculatorService service de calcul des tarifs
+     * @param inputReaderUtil utilitaire de lecture des entrées utilisateur
+     * @param parkingSpotDAO DAO pour la gestion des places de parking
+     * @param ticketDAO DAO pour la gestion des tickets
+     */
     public ParkingService(FareCalculatorService fareCalculatorService, InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
         this.fareCalculatorService = fareCalculatorService;
         this.inputReaderUtil = inputReaderUtil;
@@ -28,6 +41,13 @@ public class ParkingService {
         this.ticketDAO = ticketDAO;
     }
 
+    /**
+     * Traite l'entrée d'un véhicule dans le parking.
+     * Attribue une place, crée et enregistre un ticket.
+     * Affiche un message de bienvenue pour les utilisateurs récurrents.
+     *
+     * @return void
+     */
     public void processIncomingVehicle() {
         try {
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
@@ -61,11 +81,22 @@ public class ParkingService {
         }
     }
 
+    /**
+     * Récupère le numéro d'immatriculation du véhicule saisi par l'utilisateur.
+     *
+     * @return String le numéro d'immatriculation
+     * @throws Exception si la lecture échoue
+     */
     private String getVehichleRegNumber() throws Exception {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
 
+    /**
+     * Récupère la prochaine place de parking disponible selon le type de véhicule.
+     *
+     * @return ParkingSpot la place disponible, ou null si aucune n'est trouvée
+     */
     public ParkingSpot getNextParkingNumberIfAvailable() {
         int parkingNumber = 0;
         ParkingSpot parkingSpot = null;
@@ -85,6 +116,12 @@ public class ParkingService {
         return parkingSpot;
     }
 
+    /**
+     * Demande à l'utilisateur de sélectionner le type de véhicule (voiture ou moto).
+     *
+     * @return ParkingType le type de véhicule sélectionné
+     * @throws IllegalArgumentException si la saisie est invalide
+     */
     private ParkingType getVehichleType() {
         System.out.println("Please select vehicle type from menu");
         System.out.println("1 CAR");
@@ -104,6 +141,12 @@ public class ParkingService {
         }
     }
 
+    /**
+     * Traite la sortie d'un véhicule du parking.
+     * Calcule le tarif, applique les remises éventuelles et libère la place.
+     *
+     * @return void
+     */
     public void processExitingVehicle() {
         try {
             String vehicleRegNumber = getVehichleRegNumber();

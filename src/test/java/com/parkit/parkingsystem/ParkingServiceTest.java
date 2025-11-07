@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
@@ -20,6 +19,12 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
+/**
+ * Classe de tests unitaires pour ParkingService.
+ * Vérifie les fonctionnalités de gestion des entrées/sorties de véhicules 
+ * et de récupération des places disponibles.
+ */
 @ExtendWith(MockitoExtension.class)
 public class ParkingServiceTest {
 
@@ -34,11 +39,20 @@ public class ParkingServiceTest {
     @Mock
     private FareCalculatorService fareCalculatorService;
 
+    /**
+     * Initialise le service de parking avant chaque test.
+     */
     @BeforeEach
     void setUpPerTest() {
-            parkingService = new ParkingService(fareCalculatorService, inputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService = new ParkingService(fareCalculatorService, inputReaderUtil, parkingSpotDAO, ticketDAO);
     }
 
+    /**
+     * Teste le traitement de sortie d'un véhicule avec mise à jour réussie.
+     * Vérifie que le ticket est mis à jour et la place libérée.
+     *
+     * @throws Exception si une erreur survient
+     */
     @Test
     public void processExitingVehicleTest() throws Exception {
         // GIVEN
@@ -69,6 +83,12 @@ public class ParkingServiceTest {
         assertNotNull(ticket.getOutTime());
     }
 
+    /**
+     * Teste le traitement de sortie d'un véhicule avec échec de mise à jour.
+     * Vérifie que la place n'est pas libérée en cas d'échec.
+     *
+     * @throws Exception si une erreur survient
+     */
     @Test
     public void processExitingVehicleTestUnableUpdate() throws Exception {
         // GIVEN
@@ -98,6 +118,12 @@ public class ParkingServiceTest {
         assertNotNull(ticket.getOutTime());
     }
 
+    /**
+     * Teste le traitement d'entrée d'un véhicule.
+     * Vérifie qu'une place est attribuée et un ticket créé.
+     *
+     * @throws Exception si une erreur survient
+     */
     @Test
     public void processIncomingVehicle() throws Exception {
         // GIVEN
@@ -120,6 +146,10 @@ public class ParkingServiceTest {
         verify(ticketDAO, times(1)).saveTicket(any(Ticket.class));
     }
 
+    /**
+     * Teste la récupération d'une place disponible.
+     * Vérifie qu'une place valide est retournée.
+     */
     @Test
     public void getNextParkingNumberIfAvailableTest() {
         // GIVEN
@@ -138,6 +168,10 @@ public class ParkingServiceTest {
         assertTrue(parkingSpot.isAvailable());
     }
 
+    /**
+     * Teste la récupération d'une place quand aucune n'est disponible.
+     * Vérifie que null est retourné.
+     */
     @Test
     public void getNextParkingNumberIfAvailableParkingNumberNotFoundTest() {
         // GIVEN
@@ -154,9 +188,12 @@ public class ParkingServiceTest {
 
     }
 
+    /**
+     * Teste la récupération d'une place avec un type de véhicule invalide.
+     * Vérifie que null est retourné en cas de saisie incorrecte.
+     */
     @Test
-    public void getNextParkingNumberIfAvailableParkingNumberWrongArgument() {
-        // GIVEN
+    public void getNextParkingNumberIfAvailableParkingNumberWrongArgument() {        // GIVEN
         when(inputReaderUtil.readSelection()).thenReturn(3);
 
         // WHEN
