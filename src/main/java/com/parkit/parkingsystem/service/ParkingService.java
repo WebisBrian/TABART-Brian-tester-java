@@ -153,13 +153,18 @@ public class ParkingService {
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
+
             // Condition permettant d'appliquer la remise à la sortie du véhicule.
             if (ticketDAO.getNbTicket(vehicleRegNumber) > 1) {
                 fareCalculatorService.calculateFare(ticket, true);
             } else {
                 fareCalculatorService.calculateFare(ticket);
             }
-            if (ticketDAO.updateTicket(ticket)) {
+
+            boolean ticketUpdated = ticketDAO.updateTicket(ticket);
+            logger.info("Ticket update result for vehicle {}: {}", vehicleRegNumber, ticketUpdated);
+
+            if (ticketUpdated) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);

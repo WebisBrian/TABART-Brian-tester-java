@@ -13,6 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 
+/**
+ * Classe de test pour le service de calcul des tarifs de stationnement.
+ * Valide les différents cas d'utilisation liés au calcul des tarifs pour les voitures et les vélos.
+ */
 public class FareCalculatorServiceTest {
 
     private static FareCalculatorService fareCalculatorService;
