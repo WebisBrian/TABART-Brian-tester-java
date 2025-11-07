@@ -49,6 +49,9 @@ public class FareCalculatorService {
 
         // Réduction de 5% pour les utilisateurs récurrents.
         if (discount) { ticket.setPrice(ticket.getPrice() * 0.95); }
+
+        // Arrondir au centième
+        ticket.setPrice(roundToTwoDecimals(ticket.getPrice()));
     }
 
     /**
@@ -58,5 +61,15 @@ public class FareCalculatorService {
      */
     public void calculateFare(Ticket ticket) {
         calculateFare(ticket, false);
+    }
+
+    /**
+     * Arrondit un prix au centième (2 décimales).
+     *
+     * @param value le prix à arrondir
+     * @return le prix arrondi au centième
+     */
+    private double roundToTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }

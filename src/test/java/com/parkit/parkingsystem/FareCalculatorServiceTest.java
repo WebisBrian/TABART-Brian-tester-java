@@ -43,7 +43,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR);
+        double expectedPrice = roundToTwoDecimals(ticket.getPrice());
+        assertEquals(expectedPrice, Fare.CAR_RATE_PER_HOUR);
     }
 
     @Test
@@ -57,11 +58,12 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR);
+        double expectedPrice = roundToTwoDecimals(ticket.getPrice());
+        assertEquals(expectedPrice, Fare.BIKE_RATE_PER_HOUR);
     }
 
     @Test
-    public void calculateFareUnkownType() {
+    public void calculateFareUnknownType() {
         Date inTime = new Date();
         inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));
         Date outTime = new Date();
@@ -97,7 +99,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice());
+        double expectedPrice = roundToTwoDecimals((0.75 * Fare.BIKE_RATE_PER_HOUR));
+        assertEquals(expectedPrice, ticket.getPrice());
     }
 
     @Test
@@ -111,7 +114,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice());
+        double expectedPrice = roundToTwoDecimals((0.75 * Fare.CAR_RATE_PER_HOUR));
+        assertEquals(expectedPrice, ticket.getPrice());
     }
 
     @Test
@@ -125,7 +129,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals((24 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice());
+        double expectedPrice = roundToTwoDecimals((24 * Fare.CAR_RATE_PER_HOUR));
+        assertEquals(expectedPrice, ticket.getPrice());
     }
 
     @Test
@@ -139,7 +144,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(0, ticket.getPrice());
+        double expectedPrice = roundToTwoDecimals(0);
+        assertEquals(expectedPrice, ticket.getPrice());
     }
 
     @Test
@@ -153,7 +159,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(0, ticket.getPrice());
+        double expectedPrice = roundToTwoDecimals(0);
+        assertEquals(expectedPrice, ticket.getPrice());
     }
 
     @Test
@@ -167,7 +174,8 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket, true);
-        assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR * 0.95), ticket.getPrice());
+        double expectedPrice = roundToTwoDecimals((0.75 * Fare.CAR_RATE_PER_HOUR * 0.95));
+        assertEquals(expectedPrice, ticket.getPrice());
     }
 
     @Test
@@ -181,6 +189,15 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket, true);
-        assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR * 0.95), ticket.getPrice());
+        double expectedPrice = roundToTwoDecimals((0.75 * Fare.BIKE_RATE_PER_HOUR * 0.95));
+        assertEquals(expectedPrice, ticket.getPrice());
+    }
+
+    /**
+     * Helper pour arrondir au centième (2 décimales) dans les tests.
+     * On reproduit la logique du service pour avoir les mêmes résultats.
+     */
+    private double roundToTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }
