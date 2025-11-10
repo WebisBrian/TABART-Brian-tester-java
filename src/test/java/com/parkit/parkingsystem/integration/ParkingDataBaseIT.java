@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.integration;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -17,6 +18,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -99,4 +103,54 @@ public class ParkingDataBaseIT {
         assertTrue(ticket.getParkingSpot().isAvailable());
     }
 
+    @Test
+    public void testParkingLotExitRecurringUser() throws Exception {
+        // GIVEN
+        ParkingService parkingService = new ParkingService(fareCalculatorService, inputReaderUtil, parkingSpotDAO, ticketDAO);
+
+        // 1er passage (création de l'historique, sans remise)
+        parkingService.processIncomingVehicle();
+        setInTimeMinutesInThePast("ABCDEF", 60);
+        parkingService.processExitingVehicle();
+
+        Ticket firstTicket = ticketDAO.getTicket("ABCDEF");
+        assertNotNull(firstTicket);
+        assertTrue(firstTicket.getPrice() > 0, "Le premier passage doit être payant sans remise");
+        double firstPrice = firstTicket.getPrice();
+
+        // 2e passage (utilisateur récurrent, remise de 5% attendue)
+        parkingService.processIncomingVehicle();
+        parkingService.processExitingVehicle();
+
+        // WHEN
+        Ticket discountedTicket = ticketDAO.getTicket("ABCDEF");
+
+        // THEN
+        assertNotNull(discountedTicket);
+        assertNotNull(discountedTicket.getOutTime());
+        assertTrue(discountedTicket.getPrice() > 0);
+
+        double expectedPrice = Fare.CAR_RATE_PER_HOUR * 0.95;
+        assertEquals(expectedPrice, discountedTicket.getPrice(), 0.01,
+                "Le tarif du second passage devrait être égal au tarif plein avec 5% de remise");
+        assertTrue(discountedTicket.getPrice() < firstPrice,
+                "Le second passage (utilisateur récurant) doit coûter moins cher que le premier");
+    }
+
+    // Helper privé pour modifier IN_TIME en base (utilitaire pour certains tests)
+    private void setInTimeMinutesInThePast(String vehicleRegNumber, int minutesInThePast) throws Exception {
+        Connection con = null;
+        try {
+            con = dataBaseTestConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE ticket SET IN_TIME = ? WHERE VEHICLE_REG_NUMBER = ? AND OUT_TIME IS NULL"
+            );
+            ps.setTimestamp(1, new Timestamp(System.currentTimeMillis() - minutesInThePast * 60 * 1000));
+            ps.setString(2, vehicleRegNumber);
+            ps.executeUpdate();
+            ps.close();
+        } finally {
+            dataBaseTestConfig.closeConnection(con);
+        }
+    }
 }
