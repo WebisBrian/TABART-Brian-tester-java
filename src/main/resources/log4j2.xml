@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fichier de configuration remplaçant la version obsolète initiale -->
+<Configuration status="WARN">
+    <!-- Déclaration des "appenders" = où vont les logs -->
+    <Appenders>
+        <!-- Appender console -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- Pattern = format (schéma) du message de log -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <!-- Déclaration des loggers -->
+    <Loggers>
+        <!-- Logger racine : s'applique à tout le projet -->
+        <Root level="debug">
+            <!-- On relie le root logger à l'appender "Console" -->
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
